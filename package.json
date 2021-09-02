@@ -1,0 +1,23 @@
+{
+  "name": "project-reloaded",
+  "version": "0.0.1",
+  "description": "ProjectRELOADED 本地化專案管理器",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron ."
+  },
+  "repository": "https://github.com/CRT-HAO/ProjectRELOADED",
+  "keywords": [
+    "ProjectRELOADED",
+    "專案管理器"
+  ],
+  "author": "CRT-HAO",
+  "devDependencies": {
+    "electron": "^14.0.0"
+  },
+  "dependencies": {
+    "electron-titlebar-windows": "^3.0.0",
+    "mdui": "^1.0.2",
+    "remove": "^0.1.5"
+  }
+}
