@@ -43,12 +43,8 @@ function loadProjects(callback) {
         project.path = projectPath;
         project.invalid = projectData ? true : false;
         if(projectData) {
-            readProjectAllBackupsInfo(project.path, (data) => {
-                sortByTime = data.sort((first, second) => {
-                    return second.time - first.time;
-                });
-                latestTime = sortByTime[0].time;
-                project.lastBackup = latestTime;
+            getProjectLatestBackupDate(project, (lastBackup) => {
+                project.lastBackup = lastBackup;
                 if(isProjectDataInvalid(projectData)) projects.push(project);
                 if(callback) callback(projects);
             });
@@ -188,4 +184,25 @@ function readProjectAllBackupsInfo(projectPath, callback) {
             });
         }
     });
+    if(files.length == 0 && callback) callback(backups);
+}
+
+function getProjectLatestBackupDate(project, callback) {
+    readProjectAllBackupsInfo(project.path, (data) => {
+        sortByTime = data.sort((first, second) => {
+            return second.time - first.time;
+        });
+        latestTime = sortByTime.length > 0 ? sortByTime[0].time : 0;
+        if(callback) callback(latestTime);
+    });
+}
+
+function readProjectReadmeFile(project) {
+    let data = "";
+    try {
+        data = fs.readFileSync(path.join(project.path, "README.md"), 'utf8');
+    }catch(e) {
+        return null;
+    }
+    return data;
 }

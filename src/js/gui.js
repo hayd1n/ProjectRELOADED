@@ -6,10 +6,10 @@
 
 var { shell, dialog } = require('electron');
 window.$ = window.jQuery = require('jquery');
-jsrender = require('jsrender');
+var jsrender = require('jsrender');
 var path = require('path');
+var marked = require('marked');
 
-const loading_template = jsrender.templates('./src/template/loading.jsrender');
 const project_card_template = jsrender.templates('./src/template/project_card.jsrender');
 const project_dialog_template = jsrender.templates('./src/template/project_dialog.jsrender');
 const project_files_list_template = jsrender.templates('./src/template/files_list.jsrender');
@@ -41,12 +41,11 @@ function refreshProjects() {
 function updateProjectCards(projects) {
     clearProjectsCardContainer();
     clearProjectsDialogContainer();
-    const loading_bar = loading_template({id: "projects-loading"});
-    $('#content').prepend(loading_bar);
+    $('#content-loading-bar').toggleClass('mdui-invisible', false);
     projects.forEach((project, index) => {
         addProjectCard(project);
-        if(index === projects.length-1) $('#projects-loading').remove();
     });
+    setTimeout( () => $('#content-loading-bar').toggleClass('mdui-invisible', true), 1000);
 }
 
 function clearProjectsCardContainer() {
@@ -59,7 +58,7 @@ function clearProjectsDialogContainer() {
 
 function addProjectCard(project) {
     card_data = Object.assign({}, project);
-    card_data.lastBackup = getDateDiff(new Date(project.lastBackup));
+    card_data.lastBackup = project.lastBackup != 0 ? getDateDiff(new Date(project.lastBackup)) : "從未";
     const card = project_card_template(card_data);
     $('#projects-card-container').append(card);
     if(project.invalid) {
@@ -96,6 +95,43 @@ function addProjectDialog(project) {
     dialogElement.on('open.mdui.dialog', function () {
         tab.handleUpdate();
         tab.show(0);
+        let project_overview_text;
+        let project_overview_color;
+        let project_overview_tip_text;
+        getProjectLatestBackupDate(project, (lastBackupDate) => {
+            diffTime = Math.floor( (Date.now() - lastBackupDate) / 1000 );
+            if( lastBackupDate == 0) {
+                project_overview_text = '<i class="mdui-icon material-icons">priority_high</i> 從來沒有備份過';
+                project_overview_color = 'yellow-700';
+                project_overview_tip_text = '保持良好的備份習慣很重要';
+            }else if( diffTime < 259200) {
+                project_overview_text = '<i class="mdui-icon material-icons">check_circle</i> 近期已備份';
+                project_overview_color = 'green';
+                project_overview_tip_text = '繼續保持良好的備份習慣';
+            }else if( diffTime < 604800) {
+                project_overview_text = '<i class="mdui-icon material-icons">priority_high</i> 已經有一段時間未備份';
+                project_overview_color = 'orange';
+                project_overview_tip_text = '建議您採取行動';
+            }else{
+                project_overview_text = '<i class="mdui-icon material-icons">warning</i> 很久沒有備份';
+                project_overview_color = 'red';
+                project_overview_tip_text = '建議您立即採取行動';
+            }
+            $('.project-dialog[project-id=' + project.uuid + '] [project-overview-text]').html(project_overview_text);
+            $('.project-dialog[project-id=' + project.uuid + '] [project-overview-text]').addClass("mdui-text-color-" + project_overview_color);
+            $('.project-dialog[project-id=' + project.uuid + '] [project-overview-tip]').html(project_overview_tip_text);
+        });
+        const projectReadme = readProjectReadmeFile(project);
+        if(projectReadme) {
+            const readmeRendered = marked(projectReadme);
+            $('.project-dialog[project-id=' + project.uuid + '] [project-readme]')
+            .html(
+                '<div class="mdui-card-primary-subtitle">README.md</div>' +
+                readmeRendered
+                )
+            .parents('.mdui-card').show()
+            .find('a').attr("target", "_blank");
+        }
     });
     $('.project-dialog[project-id=' + project.uuid + '] .open-project-folder-button').on('click', (e) => {
         shell.openPath(project.path);

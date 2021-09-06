@@ -14,17 +14,22 @@
             <a href="#projects-dialog-tab-settings" class="mdui-ripple mdui-ripple-white">設置</a>
         </div>
     </div>
-    <div class="mdui-container-fluid" style="margin-top:12px;margin-bottom:12px;overflow-y:auto;height:calc(100% - 124px);">
-        <div id="projects-dialog-tab-overview" style="text-align:center;">
-            <div class="mdui-typo-headline mdui-text-color-green"><i class="mdui-icon material-icons">check_circle</i> 5分鐘前備份</div>
-            <div class="mdui-typo-subheading">您的專案已備份</div>
+    <div class="mdui-container-fluid" style="padding-top:12px;padding-bottom:12px;overflow-y:auto;height:calc(100% - 124px);">
+        <div id="projects-dialog-tab-overview" class="mdui-text-center">
+            <div class="mdui-typo-headline" project-overview-text></div>
+            <div class="mdui-typo-subheading mdui-text-color-black-secondary" project-overview-tip></div>
+            <div class="mdui-card" style="margin-top:12px;display:none;">
+                <div class="mdui-card-content mdui-text-left">
+                    <div class="project-readme-viewer" project-readme></div>
+                </div>
+            </div>
         </div>
         <div id="projects-dialog-tab-files">
         </div>
         <div id="projects-dialog-tab-backups">
         </div>
         <div id="projects-dialog-tab-settings">
-            Tab3
+            功能即將實現
         </div>
     </div>
 </div>

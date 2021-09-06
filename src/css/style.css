@@ -80,11 +80,19 @@ a, button {
 }
 
 .mdui-textfield-input {
-    cursor: text;
+    cursor: text !important;
 }
 
 .mdui-list-item {
     cursor: default;
+}
+
+.project-readme-viewer img {
+    max-width: 100%;
+}
+
+.project-readme-viewer a {
+    cursor: pointer !important;
 }
 
 .spin {

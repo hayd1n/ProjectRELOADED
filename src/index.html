@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8">
     <!-- https://developer.mozilla.org/en-US/docs/Web/HTTP/CSP -->
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self' 'unsafe-inline' 'unsafe-eval'; script-src 'self' 'unsafe-inline' 'unsafe-eval'">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self' 'unsafe-inline' 'unsafe-eval'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; img-src *;">
 
     <link rel="stylesheet" href="../node_modules/mdui/dist/css/mdui.min.css">
     <link rel="stylesheet" href="./css/style.css">
@@ -28,7 +28,12 @@
 
     <!-- 主要內容顯示區 -->
     <div id="content" class="mdui-appbar-with-toolbar">
+      <!-- 加載進度條 -->
+      <div id="content-loading-bar" class="mdui-progress">
+        <div class="mdui-progress-indeterminate"></div>
+      </div>
       <div class="mdui-container-fluid content">
+        <!-- 專案卡片容器 -->
         <div id="projects-card-container" class="mdui-row">
         </div>
       </div>
