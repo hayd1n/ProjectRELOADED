@@ -1,0 +1,12 @@
+<ul class="mdui-list backups-list" style="padding-top:0;">
+    {{for backups sort="time" reverse=true}}
+    <li class="mdui-list-item"">
+        <i class="mdui-list-item-avatar mdui-icon material-icons">access_time</i>
+        <div class="mdui-list-item-content">
+            <div class="mdui-list-item-title">{{:name}}</div>
+            <div class="mdui-list-item-text mdui-list-item-one-line">{{:time}}</div>
+        </div>
+        <a href="javascript:;" class="mdui-btn"><i class="mdui-list-item-icon mdui-icon material-icons">restore</i> 回朔</a>
+    </li>
+    {{/for}}
+</ul>

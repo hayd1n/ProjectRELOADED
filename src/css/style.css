@@ -4,6 +4,93 @@
  *   CISH Robotics Team
  */
 
-.appbar-with-titlebar {
-    top: 20px;
+*, *::after, *::before {
+	-webkit-user-select: none;
+    user-select: none;
+	-webkit-user-drag: none;
 }
+
+a, button {
+    cursor: default !important;
+}
+
+.titlebar {
+    position: fixed;
+    top: 0;
+    left:0;
+    width: 100%;
+    z-index: 9999999999;
+    -webkit-app-region: drag
+}
+
+.titlebar-win10 {
+    height: 32px;
+}
+
+.titlebar-macos-mojave-or-later {
+    height: 22px;
+}
+
+.titlebar-macos-bigsur-or-later {
+    height: 26px;
+}
+
+.appbar-with-titlebar {
+    -webkit-app-region: drag
+}
+
+.appbar-with-titlebar a {
+    -webkit-app-region: no-drag;
+}
+
+.appbar-with-titlebar-win10 {
+    top: 32px;
+}
+
+.appbar-with-titlebar-macos-mojave-or-later {
+    top: 22px;
+}
+
+.appbar-with-titlebar-titlebar-macos-bigsur-or-later {
+    top: 26px;
+}
+
+.body-with-titlebar-win10 {
+    padding-top: 32px;
+}
+
+.body-with-titlebar-macos-mojave-or-later {
+    padding-top: 22px;
+}
+
+.body-with-titlebar-titlebar-macos-bigsur-or-later {
+    padding-top: 26px;
+}
+
+.content {
+    padding-top: 10px;
+}
+
+.project-card:not(:last-child) {
+    margin-bottom: 12px;
+}
+
+.project-dialog {
+    height: 80% !important;
+}
+
+.mdui-textfield-input {
+    cursor: text;
+}
+
+.mdui-list-item {
+    cursor: default;
+}
+
+.spin {
+    -webkit-animation:spin 1s linear infinite;
+    animation:spin 1s linear infinite;
+}
+
+@-webkit-keyframes spin { 100% { -webkit-transform: rotate(-360deg); } }
+@keyframes spin { 100% { -webkit-transform: rotate(-360deg); transform:rotate(-360deg); } }

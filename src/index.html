@@ -3,33 +3,49 @@
   <head>
     <meta charset="UTF-8">
     <!-- https://developer.mozilla.org/en-US/docs/Web/HTTP/CSP -->
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self' 'unsafe-inline' 'unsafe-eval'; script-src 'self' 'unsafe-inline' 'unsafe-eval'">
 
     <link rel="stylesheet" href="../node_modules/mdui/dist/css/mdui.min.css">
     <link rel="stylesheet" href="./css/style.css">
 
     <title>ProjectRELOADED</title>
   </head>
-  <body class="mdui-appbar-with-toolbar mdui-theme-primary-indigo mdui-theme-accent-pink mdui-theme-layout-auto">
+  <body class="mdui-theme-primary-indigo mdui-theme-accent-pink">
 
-    <div class="mdui-appbar mdui-appbar-fixed appbar-with-titlebar">
+    <!-- 標題欄 -->
+    <div id="titlebar" class="titlebar mdui-color-theme"></div>
+
+    <!-- 頂部工具欄 -->
+    <div id="appbar" class="mdui-appbar mdui-appbar-fixed appbar-with-titlebar">
       <div class="mdui-toolbar mdui-color-theme">
-        <a href="javascript:;" class="mdui-btn mdui-btn-icon"><i class="mdui-icon material-icons">menu</i></a>
-        <a href="javascript:;" class="mdui-typo-title">ProjectRELOADED</a>
+        <span class="mdui-typo-title">ProjectRELOADED</span>
         <div class="mdui-toolbar-spacer"></div>
         <a href="javascript:;" class="mdui-btn mdui-btn-icon"><i class="mdui-icon material-icons">search</i></a>
-        <a href="javascript:;" class="mdui-btn mdui-btn-icon"><i class="mdui-icon material-icons">refresh</i></a>
+        <a href="javascript:;" class="mdui-btn mdui-btn-icon" id="refresh-projects"><i class="mdui-icon material-icons">refresh</i></a>
         <a href="javascript:;" class="mdui-btn mdui-btn-icon"><i class="mdui-icon material-icons">more_vert</i></a>
       </div>
     </div>
 
-    <div class="mdui-container-fluid">
-      Content
+    <!-- 主要內容顯示區 -->
+    <div id="content" class="mdui-appbar-with-toolbar">
+      <div class="mdui-container-fluid content">
+        <div id="projects-card-container" class="mdui-row">
+        </div>
+      </div>
     </div>
 
+    <!-- 新增專案按鈕 -->
+    <button class="mdui-fab mdui-fab-fixed mdui-color-theme-accent mdui-ripple"><i class="mdui-icon material-icons">add</i></button>
+
+    <!-- 專案設置視窗 -->
+    <div id="projects-dialog-container"></div>
+
     <!-- You can also require other files to run in this process -->
-    <script src="./js/renderer.js"></script>
     <script src="../node_modules/mdui/dist/js/mdui.min.js"></script>
+    <script src="./js/gui.js"></script>
+    <script src="./js/projects.js"></script>
+    <script src="./js/main.js"></script>
+    <script src="./js/renderer.js"></script>
 
   </body>
 </html>

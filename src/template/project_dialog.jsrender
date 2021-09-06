@@ -1,0 +1,30 @@
+<div class="mdui-dialog project-dialog" project-id="{{:uuid}}">
+    <div class="mdui-appbar mdui-shadow-0">
+        <div class="mdui-toolbar mdui-color-theme">
+            <span class="mdui-typo-title">{{:name}}</span>
+            <div class="mdui-toolbar-spacer"></div>
+            <a href="javascript:;" class="mdui-btn mdui-ripple open-project-folder-button"><i class="mdui-icon material-icons">folder_open</i> <span class="mdui-hidden-xs-down">打開</span></a>
+            <a href="javascript:;" class="mdui-btn mdui-ripple backup-project-button"><i class="mdui-icon material-icons">settings_backup_restore</i> <span class="mdui-hidden-xs-down">備份</span></a>
+            <a href="javascript:;" class="mdui-btn mdui-ripple"><i class="mdui-icon material-icons">archive</i> <span class="mdui-hidden-xs-down">打包</span></a>
+        </div>
+        <div class="mdui-tab mdui-tab-full-width mdui-color-theme projects-dialog-tab">
+            <a href="#projects-dialog-tab-overview" class="mdui-ripple mdui-ripple-white">概覽</a>
+            <a href="#projects-dialog-tab-files" class="mdui-ripple mdui-ripple-white" refresh-files-list>檔案</a>
+            <a href="#projects-dialog-tab-backups" class="mdui-ripple mdui-ripple-white" refresh-backups-list>備份</a>
+            <a href="#projects-dialog-tab-settings" class="mdui-ripple mdui-ripple-white">設置</a>
+        </div>
+    </div>
+    <div class="mdui-container-fluid" style="margin-top:12px;margin-bottom:12px;overflow-y:auto;height:calc(100% - 124px);">
+        <div id="projects-dialog-tab-overview" style="text-align:center;">
+            <div class="mdui-typo-headline mdui-text-color-green"><i class="mdui-icon material-icons">check_circle</i> 5分鐘前備份</div>
+            <div class="mdui-typo-subheading">您的專案已備份</div>
+        </div>
+        <div id="projects-dialog-tab-files">
+        </div>
+        <div id="projects-dialog-tab-backups">
+        </div>
+        <div id="projects-dialog-tab-settings">
+            Tab3
+        </div>
+    </div>
+</div>

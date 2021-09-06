@@ -13,9 +13,16 @@ function createWindow () {
   const mainWindow = new BrowserWindow({
     width: 800,
     height: 600,
+    fullscreenable: false,
     titleBarStyle: 'hidden',
-    titleBarOverlay: true,
+    titleBarOverlay: {
+      color: "#3F51B5",
+      symbolColor: "#FFFFFF"
+    },
     webPreferences: {
+      nodeIntegration: true,
+      enableRemoteModule: true,
+      contextIsolation: false,
       preload: path.join(__dirname, 'src/js/preload.js')
     }
   });

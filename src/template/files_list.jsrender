@@ -1,0 +1,14 @@
+<ul class="mdui-list files-list" style="padding-top:0;">
+    {{for files sort="folder" reverse=true}}
+        <li class="mdui-list-item mdui-ripple" file-path="{{:path}}" {{if ignore}}disabled{{/if}}>
+            <i class="mdui-list-item-avatar mdui-icon material-icons">{{if folder}}folder{{else}}assignment{{/if}}</i>
+            <div class="mdui-list-item-content">
+                {{if ignore}}
+                    <del class="mdui-text-color-black-disabled">{{:name}}</del> <span class="mdui-text-color-black-disabled">已忽略</span>
+                {{else}}
+                    {{:name}}
+                {{/if}}
+            </div>
+        </li>
+    {{/for}}
+</ul>
