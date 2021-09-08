@@ -4,11 +4,13 @@
  *   CISH Robotics Team
  */
 
-var { shell, dialog } = require('electron');
+var { shell } = require('electron');
+var { dialog } = require('@electron/remote');
 window.$ = window.jQuery = require('jquery');
 var jsrender = require('jsrender');
 var path = require('path');
 var marked = require('marked');
+// const { default: mdui } = require('mdui');
 
 const project_card_template = jsrender.templates('./src/template/project_card.jsrender');
 const project_dialog_template = jsrender.templates('./src/template/project_dialog.jsrender');
@@ -29,11 +31,30 @@ $(window).on('error', (e) => {
     console.log(e);
 });
 
-$(document).on('ready', refreshProjects);
-$('#refresh-projects').on('click', refreshProjects);
+$(document).on('ready', () => {
+    setTimeout(()=>{
+        refreshProjects();
+    }, 1000);
+});
+$('#refresh-projects').on('click', () => {
+    refreshProjects();
+});
+
+$('[choose-add-project-path]').on('click', () => {
+    dialog.showOpenDialog({
+        properties: ['openDirectory']
+      }).then(result => {
+        if(!result.canceled) {
+            addProject(result.filePaths[0], () => {
+                refreshProjects();
+            });
+        }
+      });
+});
 
 function refreshProjects() {
     loadProjects((projects) => {
+        console.log(projects);
         updateProjectCards(projects);
     });
 }
@@ -42,10 +63,14 @@ function updateProjectCards(projects) {
     clearProjectsCardContainer();
     clearProjectsDialogContainer();
     $('#content-loading-bar').toggleClass('mdui-invisible', false);
-    projects.forEach((project, index) => {
+    syncforeach(projects, (next, project, index) => {
         addProjectCard(project);
+        next();
+    }).done(() => {
+        setTimeout(() => {
+            $('#content-loading-bar').toggleClass('mdui-invisible', true)
+        }, 1000);
     });
-    setTimeout( () => $('#content-loading-bar').toggleClass('mdui-invisible', true), 1000);
 }
 
 function clearProjectsCardContainer() {
@@ -62,7 +87,7 @@ function addProjectCard(project) {
     const card = project_card_template(card_data);
     $('#projects-card-container').append(card);
     if(project.invalid) {
-        dialog = addProjectDialog(project);
+        let dialog = addProjectDialog(project);
         $('.project-card[project-id=' + project.uuid + '] .project-dialog-button').on('click', (e) => {
             console.log("打開專案窗口" + project.uuid);
             dialog.open();
@@ -82,6 +107,20 @@ function addProjectCard(project) {
 
             });
         });
+    }else{
+        $(project_card_template).find('[delete-project-button]').on('click', (e) => {
+            mdui.confirm('確定要移除專案嗎？', '確定移除？', (e) => {
+                deleteProject(project, () => {
+                    mdui.snackbar({
+                        message: '專案已移除'
+                    });
+                    refreshProjects();
+                });
+            }, undefined, options = {
+                confirmText: "確定",
+                cancelText: "取消"
+            });
+        });
     }
 }
 
@@ -89,7 +128,7 @@ function addProjectDialog(project) {
     const dialog_html = project_dialog_template(project);
     $('#projects-dialog-container').append(dialog_html);
     dialogElement = $('.project-dialog[project-id=' + project.uuid + ']');
-    dialog = new mdui.Dialog(dialogElement);
+    let dialog = new mdui.Dialog(dialogElement);
     const tabElement = $('[project-id=' + project.uuid + '] .projects-dialog-tab');
     const tab = new mdui.Tab(tabElement);
     dialogElement.on('open.mdui.dialog', function () {
@@ -151,11 +190,51 @@ function addProjectDialog(project) {
         });
     });
     $('.project-dialog[project-id=' + project.uuid + '] [refresh-files-list]').on('click', (e) => {
-        updateFilesList($('.project-dialog[project-id=' + project.uuid + '] #projects-dialog-tab-files'), readProjectFiles(project.path));
+        updateFilesList($('.project-dialog[project-id=' + project.uuid + '] [project-files-list]'), readProjectFiles(project.path));
     });
     $('.project-dialog[project-id=' + project.uuid + '] [refresh-backups-list]').on('click', (e) => {
         readProjectAllBackupsInfo(project.path, (backupsList) => {
-            updateBackupsList($('.project-dialog[project-id=' + project.uuid + '] #projects-dialog-tab-backups'), backupsList);
+            updateBackupsList($('.project-dialog[project-id=' + project.uuid + '] [project-backups-list]'), backupsList);
+            $('.project-dialog[project-id=' + project.uuid + '] [restore-backup]').on('click', (e) => {
+                dialog.close();
+                const backup_filename = $(e.currentTarget).parents('li[project-backup-file]').attr('project-backup-file');
+                mdui.confirm("請確認是否要還原專案？", "確認還原？", () => {
+                    restoreProjectBackup(project, backup_filename, () => {
+                        mdui.snackbar({
+                            message: '專案已還原'
+                        });
+                        showNotification("備份已還原", project.name);
+                        refreshProjects();
+                    });
+                });
+            });
+            $('.project-dialog[project-id=' + project.uuid + '] [delete-backup]').on('click', (e) => {
+                dialog.close();
+                const backup_filename = $(e.currentTarget).parents('li[project-backup-file]').attr('project-backup-file');
+                mdui.confirm("請確認是否要刪除備份？", "確認刪除？", () => {
+                    deleteProjectBackupFile(project, backup_filename, () => {
+                        mdui.snackbar({
+                            message: '備份已刪除'
+                        });
+                        refreshProjects();
+                    });
+                });
+            });
+        });
+    });
+    $('.project-dialog[project-id=' + project.uuid + '] [delete-project-button]').on('click', (e) => {
+        dialog.close();
+        const deleteDialogElement = $('#delete-project-dialog');
+        const deleteDialog = new mdui.Dialog(deleteDialogElement);
+        deleteDialog.open();
+        deleteDialogElement.on('confirm.mdui.dialog', (e) => {
+            const deleteConfig = $('[delete-project-config] input')[0].checked;
+            deleteProject(project, () => {
+                mdui.snackbar({
+                    message: '專案已移除'
+                });
+                refreshProjects();
+            }, deleteConfig);
         });
     });
     return dialog;
@@ -180,8 +259,7 @@ function updateBackupsList(selector, backups) {
 
 function backupProjectDialog(project, start, success) {
     const now = new Date();
-    mdui.prompt('備份名稱', '請輸入備份名稱',
-    function (value) {
+    mdui.prompt('備份名稱', '請輸入備份名稱', (value) => {
         showNotification("開始備份專案", project.name);
         if(start) start();
         backupProject(project.path, value, () => {
@@ -202,6 +280,21 @@ function backupProjectDialog(project, start, success) {
         confirmOnEnter: true
     }
   );
+}
+
+function createProjectDialog(projectPath) {
+    mdui.prompt('專案名稱', '創建專案', (name) => {
+        createProject(projectPath, name, () => {
+            mdui.snackbar({
+                message: '專案已創建'
+            });
+            refreshProjects();
+        });
+    }, undefined, {
+        defaultValue: path.parse(projectPath).name,
+        confirmText: "創建",
+        cancelText: "取消"
+    });
 }
 
 function getDateDiff(dateTimeStamp) {

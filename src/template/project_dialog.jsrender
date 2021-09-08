@@ -8,28 +8,31 @@
             <a href="javascript:;" class="mdui-btn mdui-ripple"><i class="mdui-icon material-icons">archive</i> <span class="mdui-hidden-xs-down">打包</span></a>
         </div>
         <div class="mdui-tab mdui-tab-full-width mdui-color-theme projects-dialog-tab">
-            <a href="#projects-dialog-tab-overview" class="mdui-ripple mdui-ripple-white">概覽</a>
-            <a href="#projects-dialog-tab-files" class="mdui-ripple mdui-ripple-white" refresh-files-list>檔案</a>
-            <a href="#projects-dialog-tab-backups" class="mdui-ripple mdui-ripple-white" refresh-backups-list>備份</a>
-            <a href="#projects-dialog-tab-settings" class="mdui-ripple mdui-ripple-white">設置</a>
+            <a href="#projects-dialog-tab-overview-{{:uuid}}" class="mdui-ripple mdui-ripple-white">概覽</a>
+            <a href="#projects-dialog-tab-files-{{:uuid}}" class="mdui-ripple mdui-ripple-white" refresh-files-list>檔案</a>
+            <a href="#projects-dialog-tab-backups-{{:uuid}}" class="mdui-ripple mdui-ripple-white" refresh-backups-list>備份</a>
+            <a href="#projects-dialog-tab-settings-{{:uuid}}" class="mdui-ripple mdui-ripple-white">設置</a>
         </div>
     </div>
-    <div class="mdui-container-fluid" style="padding-top:12px;padding-bottom:12px;overflow-y:auto;height:calc(100% - 124px);">
-        <div id="projects-dialog-tab-overview" class="mdui-text-center">
-            <div class="mdui-typo-headline" project-overview-text></div>
-            <div class="mdui-typo-subheading mdui-text-color-black-secondary" project-overview-tip></div>
-            <div class="mdui-card" style="margin-top:12px;display:none;">
+    <div class="mdui-container-fluid" style="padding-top:12px;padding-bottom:12px;overflow-y:auto;height:calc(100% - 120px);">
+        <div id="projects-dialog-tab-overview-{{:uuid}}" class="mdui-text-center">
+            <div style="padding-top:8px;padding-bottom:20px;">
+                <div class="mdui-typo-headline" project-overview-text></div>
+                <div class="mdui-typo-subheading mdui-text-color-black-secondary" project-overview-tip></div>
+            </div>
+                <div class="mdui-card" style="display:none;">
                 <div class="mdui-card-content mdui-text-left">
                     <div class="project-readme-viewer" project-readme></div>
                 </div>
             </div>
         </div>
-        <div id="projects-dialog-tab-files">
+        <div id="projects-dialog-tab-files-{{:uuid}}" project-files-list>
         </div>
-        <div id="projects-dialog-tab-backups">
+        <div id="projects-dialog-tab-backups-{{:uuid}}" project-backups-list>
         </div>
-        <div id="projects-dialog-tab-settings">
-            功能即將實現
+        <div id="projects-dialog-tab-settings-{{:uuid}}">
+            <button class="mdui-btn mdui-btn-block mdui-color-red mdui-ripple" delete-project-button><i class="mdui-icon material-icons">delete</i> 移除專案</button>
+            <div class="mdui-typo-caption mdui-text-color-black-secondary" style="margin-top:6px">移除專案不會刪除您專案目錄下的文件。</div>
         </div>
     </div>
 </div>

@@ -20,16 +20,25 @@
       <div class="mdui-toolbar mdui-color-theme">
         <span class="mdui-typo-title">ProjectRELOADED</span>
         <div class="mdui-toolbar-spacer"></div>
-        <a href="javascript:;" class="mdui-btn mdui-btn-icon"><i class="mdui-icon material-icons">search</i></a>
+        <!-- <a href="javascript:;" class="mdui-btn mdui-btn-icon"><i class="mdui-icon material-icons">search</i></a> -->
         <a href="javascript:;" class="mdui-btn mdui-btn-icon" id="refresh-projects"><i class="mdui-icon material-icons">refresh</i></a>
-        <a href="javascript:;" class="mdui-btn mdui-btn-icon"><i class="mdui-icon material-icons">more_vert</i></a>
+        <a href="javascript:;" class="mdui-btn mdui-btn-icon" mdui-menu="{target: '#menu_more'}"><i class="mdui-icon material-icons">more_vert</i></a>
+        <ul class="mdui-menu" id="menu_more">
+          <li class="mdui-menu-item" mdui-dialog="{target: '#settings'}">
+            <a href="javascript:;">設置</a>
+          </li>
+          <li class="mdui-divider"></li>
+          <li class="mdui-menu-item" mdui-dialog="{target: '#about'}">
+            <a href="javascript:;">關於</a>
+          </li>
+        </ul>
       </div>
     </div>
 
     <!-- 主要內容顯示區 -->
     <div id="content" class="mdui-appbar-with-toolbar">
       <!-- 加載進度條 -->
-      <div id="content-loading-bar" class="mdui-progress">
+      <div id="content-loading-bar" class="mdui-progress mdui-invisible">
         <div class="mdui-progress-indeterminate"></div>
       </div>
       <div class="mdui-container-fluid content">
@@ -40,15 +49,73 @@
     </div>
 
     <!-- 新增專案按鈕 -->
-    <button class="mdui-fab mdui-fab-fixed mdui-color-theme-accent mdui-ripple"><i class="mdui-icon material-icons">add</i></button>
+    <button class="mdui-fab mdui-fab-fixed mdui-color-theme-accent mdui-ripple" mdui-dialog="{target: '#add-project-dialog'}"><i class="mdui-icon material-icons">add</i></button>
+    <!-- 新增專案視窗 -->
+    <div class="mdui-dialog" id="add-project-dialog">
+      <div class="mdui-dialog-title">加入專案</div>
+      <div class="mdui-dialog-content">
+        <p>請選擇您的專案目錄</p>
+        <p>如果您的專案已存在ProjectRELOADED的資料，將自動導入</p>
+      </div>
+      <div class="mdui-dialog-actions">
+        <button class="mdui-btn mdui-ripple" mdui-dialog-close>取消</button>
+        <button class="mdui-btn mdui-ripple" mdui-dialog-confirm choose-add-project-path>選擇目錄</button>
+      </div>
+    </div>
 
     <!-- 專案設置視窗 -->
     <div id="projects-dialog-container"></div>
 
+    <!-- 刪除專案確認視窗 -->
+    <div class="mdui-dialog" id="delete-project-dialog">
+      <div class="mdui-dialog-title">確認移除專案？</div>
+      <div class="mdui-dialog-content">
+        <p>您確認要移除專案嗎？這項操作不可復原</p>
+        <p>
+          <label class="mdui-checkbox" delete-project-config>
+            <input type="checkbox">
+            <i class="mdui-checkbox-icon"></i>
+            同時移除專案目錄下ProjectRELOADED的配置文件(備份、設置...)
+          </label>
+        </p>
+      </div>
+      <div class="mdui-dialog-actions">
+        <button class="mdui-btn mdui-ripple" mdui-dialog-close>取消</button>
+        <button class="mdui-btn mdui-ripple" mdui-dialog-confirm>移除</button>
+      </div>
+    </div>
+
+    <!-- 設置視窗 -->
+    <div class="mdui-dialog" id="settings">
+      <div class="mdui-dialog-title">設置</div>
+      <div class="mdui-dialog-content">
+        目前還沒有，更多功能盡請期待！
+      </div>
+      <div class="mdui-dialog-actions">
+        <button class="mdui-btn mdui-ripple" mdui-dialog-close>取消</button>
+        <button class="mdui-btn mdui-ripple" mdui-dialog-confirm>保存</button>
+      </div>
+    </div>
+
+    <!-- 關於對話框 -->
+    <div class="mdui-dialog" id="about">
+      <div class="mdui-dialog-title">關於</div>
+      <div class="mdui-dialog-content">
+        ProjectRELOADED<br>
+        一款開源的本地化專案管理(備份)器<br>
+        <br>
+        項目地址：<a href="https://github.com/CRT-HAO/ProjectRELOADED" target="_blank" class="mdui-text-color-theme-accent">CRT-HAO/ProjectRELOADED</a><br>
+        作者：<a href="https://github.com/CRT-HAO" target="_blank" class="mdui-text-color-theme-accent">CRT-HAO</a>
+      </div>
+      <div class="mdui-dialog-actions">
+        <button class="mdui-btn mdui-ripple" mdui-dialog-close>確認</button>
+      </div>
+    </div>
+
     <!-- You can also require other files to run in this process -->
     <script src="../node_modules/mdui/dist/js/mdui.min.js"></script>
-    <script src="./js/gui.js"></script>
     <script src="./js/projects.js"></script>
+    <script src="./js/gui.js"></script>
     <script src="./js/main.js"></script>
     <script src="./js/renderer.js"></script>
 

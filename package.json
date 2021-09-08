@@ -16,6 +16,8 @@
     "electron": "^14.0.0"
   },
   "dependencies": {
+    "@electron/remote": "^1.2.1",
+    "adm-zip": "^0.5.5",
     "electron-store": "^8.0.0",
     "electron-titlebar-windows": "^3.0.0",
     "jQuery": "^1.7.4",
@@ -26,6 +28,8 @@
     "node-stream-zip": "^1.14.0",
     "picomatch": "^2.3.0",
     "remove": "^0.1.5",
+    "rimraf": "^3.0.2",
+    "sync-foreach": "^1.0.2",
     "uuid": "^8.3.2"
   }
 }

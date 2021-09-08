@@ -4,15 +4,20 @@
  *   CISH Robotics Team
  */
 
+var Store = require('@electron/remote').require('electron-store');
 var os = require('os');
 var fs = require('fs');
 var path = require('path');
 var JSZip = require("jszip");
 var StreamZip = require('node-stream-zip');
+var AdmZip = require('adm-zip');
 var pm = require('picomatch');
 var { v4: uuidv4 } = require('uuid');
+var syncforeach = require('@electron/remote').require('sync-foreach');
+var rimraf = require("rimraf");
 
-// let projects = [];
+const store = new Store();
+
 
 function readProject(projectPath) {
     console.log("讀取專案配置", path.join(projectPath, "/.projectRELOADED/project.json"));
@@ -26,18 +31,14 @@ function readProject(projectPath) {
 }
 
 function isProjectDataInvalid(projectData) {
-    valid = projectData.uuid != "";
-    valid &= projectData.name != "";
+    valid = projectData.uuid != undefined && projectData.name != undefined ? true : false;
     return valid;
 }
 
 function loadProjects(callback) {
     let projects = [];
-    projectsPath = [
-        "/Users/hao/Documents/GitHub/ProjectRELOAD/test/TestProject",
-        "/Users/hao/Documents/GitHub/ProjectRELOAD/test/TestProject2"
-    ];
-    projectsPath.forEach((projectPath) => {
+    projectsPath = readProjectsPath();
+    syncforeach(projectsPath, (next, projectPath) => {
         const projectData = readProject(projectPath);
         let project = projectData ? projectData : {};
         project.path = projectPath;
@@ -46,24 +47,76 @@ function loadProjects(callback) {
             getProjectLatestBackupDate(project, (lastBackup) => {
                 project.lastBackup = lastBackup;
                 if(isProjectDataInvalid(projectData)) projects.push(project);
-                if(callback) callback(projects);
+                next();
             });
         }else{
             projects.push(project);
-            if(callback) callback(projects);
+            next();
+        }
+    }).done(() => {
+        if(callback) {
+            callback(projects);
         }
     });
 }
 
-function readFileList(path) {
+function addProject(projectPath, callback) {
+    if(fs.existsSync(path.join(projectPath, "/.projectRELOADED/project.json"))) {
+        console.log("發現projectRELOADED配置文件" + projectPath);
+        if(!readProjectsPath().includes(projectPath)) {
+            addProjectPath(projectPath);
+        }
+    }else{
+        createProjectDialog(projectPath);
+    }
+    if(callback) callback();
+}
+
+function createProject(projectPath, name, callback) {
+    data = {
+        uuid: uuidv4(),
+        name: name,
+        createDate: Date.now(),
+        creator: {
+            username: os.userInfo().username,
+            hostname: os.hostname(),
+            platform: process.platform,
+            systemVerstion: process.getSystemVersion()
+        }
+    };
+    fs.mkdir(path.join(projectPath, "/.projectRELOADED"), (err) => { 
+        if (err) { 
+            throw err;
+        } 
+        fs.mkdir(path.join(projectPath, "/.projectRELOADED/backups"), (err) => { 
+            if (err) { 
+                throw err;
+            } 
+            fs.writeFile(path.join(projectPath, "/.projectRELOADED/project.json"), JSON.stringify(data), (err) => {
+                if (err) {
+                    throw err;
+                }
+                addProject(projectPath, () => {
+                    if(callback) callback();
+                });
+            });
+        });
+    });
+}
+
+function readFileList(path, onRead, onDone) {
     files_list = [];
-    fs.readdirSync(path).forEach((file)=>{
+    syncforeach(fs.readdirSync(path), (next, file)=>{
         files_list.push(file);
+        if(onRead) onRead(file);
+        next();
+    }).done(() => {
+        if(onDone) onDone();
     });
     return files_list;
 }
 
-function readProjectFiles(projectPath) {
+function readProjectFiles(projectPath, onRead) {
     console.log("讀取目錄" + projectPath);
     const ignore_list = readProjectIgnoreList(projectPath);
     files_list = [];
@@ -76,6 +129,7 @@ function readProjectFiles(projectPath) {
                 path: pathname,
                 ignore: pm.isMatch(file, ignore_list)
             });
+            if(onRead) onRead(pathname);
         }
     });
     return files_list;
@@ -128,7 +182,7 @@ function readProjectToZip(projectPath, zip, hiddenProjectInfo=true) {
     readFullDirToZip(zip, projectPath);
 }
 
-function backupProject(projectPath, name, success) {
+function backupProject(projectPath, name, success, type=0) {
     console.log("備份專案目錄" + projectPath);
     const backupFilename = Date.now().toString() + ".pjrlb";
     const backupPath = path.join(projectPath, "/.projectRELOADED/backups/");
@@ -140,8 +194,13 @@ function backupProject(projectPath, name, success) {
         uuid: uuidv4(),
         name: name,
         time: Date.now(),
-        backupHostName: os.hostname(),
-        backupUserName: os.userInfo().username
+        type: type,
+        creator: {
+            username: os.userInfo().username,
+            hostname: os.hostname(),
+            platform: process.platform,
+            systemVerstion: process.getSystemVersion()
+        }
     };
     zip.file("backup.json", new TextEncoder("utf-8").encode(JSON.stringify(backupInfo)));
 
@@ -161,6 +220,7 @@ function readBackupInfo(backupFile, callback) {
             const entry = zip.entryDataSync('backup.json');
             const projectInfo = JSON.parse(entry);
             projectInfo.time = new Date(projectInfo.time);
+            projectInfo.filename = backupFile;
             if(callback) callback(projectInfo);
             zip.close();
         });
@@ -187,6 +247,47 @@ function readProjectAllBackupsInfo(projectPath, callback) {
     if(files.length == 0 && callback) callback(backups);
 }
 
+function restoreProjectBackup(project, backupFileName, callback) {
+    const backupFile = path.join(project.path, "/.projectRELOADED/backups/", backupFileName);
+    readBackupInfo(backupFile, (data) => {
+        if(true) {
+        // if(data.type != 2) {
+            backupProject(project.path, "還原到「" + data.name + "」的自動備份", () => {
+                restore();
+            }, type=2);
+        }else{
+            restore();
+        }
+        function restore() {
+            function deleteAllProjectFiles(projectPath) {
+                readFileList(projectPath, (filename) => {
+                    if(filename != ".projectRELOADED") {
+                        const filePath = path.join(projectPath, filename);
+                        const file = fs.statSync(filePath);
+                        if(file.isDirectory()) {
+                            deleteAllProjectFiles(path.join(projectPath, filename));
+                        }else{
+                            fs.unlinkSync(filePath);
+                        }
+                    }
+                });
+            }
+            deleteAllProjectFiles(project.path);
+            const zip = new AdmZip(backupFile);
+            zip.extractAllTo(project.path, true);
+            try {
+                fs.unlinkSync(path.join(project.path, "backup.json"));
+            }catch(e){}
+            if(callback) callback();
+        }
+    });
+}
+
+function deleteProjectBackupFile(project, filename, callback) {
+    rimraf.sync(path.join(project.path, "/.projectRELOADED/backups/", filename));
+    if(callback) callback();
+}
+
 function getProjectLatestBackupDate(project, callback) {
     readProjectAllBackupsInfo(project.path, (data) => {
         sortByTime = data.sort((first, second) => {
@@ -205,4 +306,36 @@ function readProjectReadmeFile(project) {
         return null;
     }
     return data;
+}
+
+function deleteProject(project, callback, deleteConfig=false) {
+    if(deleteConfig) rimraf.sync(path.join(project.path, "/.projectRELOADED/"));
+    removeProjectPath(project.path);
+    if(callback) callback();
+}
+
+function readProjectsPath() {
+    if(!store.has('projectsPath')) {
+        store.set('projectsPath', []);
+    }
+    return store.get('projectsPath');
+}
+
+function writeProjectsPath(projectsPath) {
+    return store.set('projectsPath', projectsPath);
+}
+
+function addProjectPath(projectPath) {
+    let projectsPath = readProjectsPath();
+    projectsPath.push(projectPath);
+    writeProjectsPath(projectsPath);
+}
+
+function removeProjectPath(projectPath) {
+    let projectsPath = readProjectsPath();
+    const index = projectsPath.indexOf(projectPath);
+    if (index > -1) {
+        projectsPath.splice(index, 1);
+    }
+    writeProjectsPath(projectsPath);
 }

@@ -5,12 +5,17 @@
  */
 
 // Modules to control application life and create native browser window
-const {app, BrowserWindow, screen} = require('electron');
+const {app, BrowserWindow, Menu, Tray} = require('electron');
 const path = require('path');
+
+require('@electron/remote/main').initialize();
+
+let mainWindow;
 
 function createWindow () {
   // Create the browser window.
-  const mainWindow = new BrowserWindow({
+  mainWindow = new BrowserWindow({
+    show: false,
     width: 800,
     height: 600,
     fullscreenable: false,
@@ -35,14 +40,29 @@ function createWindow () {
   // and load the index.html of the app.
   mainWindow.loadFile('src/index.html');
 
+  
+  mainWindow.once('ready-to-show', () => {
+    mainWindow.show();
+  });
+  
   // Open the DevTools.
   mainWindow.webContents.openDevTools({ mode: 'detach' });
+
+  mainWindow.on('closed', (event) => {
+      mainWindow = null;
+  });
+  mainWindow.on('close', (event) => {
+      event.preventDefault();
+      mainWindow.hide();
+      mainWindow.setSkipTaskbar(true);
+  });
 }
 
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.
 app.whenReady().then(() => {
+  createTray();
   createWindow();
 
   app.on('activate', function () {
@@ -61,3 +81,28 @@ app.on('window-all-closed', function () {
 
 // In this file you can include the rest of your app's specific main process
 // code. You can also put them in separate files and require them here.
+
+let tray;
+function createTray() {
+  tray = new Tray(path.join(__dirname, './assets/icon-tray-black.png'));
+  const contextMenu = Menu.buildFromTemplate([
+    {
+      label: '打開',
+      click: () => {
+        mainWindow.show();
+        mainWindow.setSkipTaskbar(false);
+      }
+    },
+    {
+      type: 'separator',
+    },
+    {
+      label: '退出 ProjectRELOADED',
+      click: () => {
+        app.quit();
+      }
+    }
+  ]);
+  tray.setToolTip('ProjectRELOADED');
+  tray.setContextMenu(contextMenu);
+}
