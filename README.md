@@ -15,7 +15,11 @@
  ```
  編譯 Build
  ```
- node build.js
+ npm run build
+ ```
+ or
+ ```
+ npm run deploy
  ```
  ## 截圖 Screenshots
 <img width="1041" alt="截圖 2021-09-06 下午8 58 54" src="https://user-images.githubusercontent.com/31580253/132221194-71abedd6-314c-4951-a860-15129906e2f0.png">
