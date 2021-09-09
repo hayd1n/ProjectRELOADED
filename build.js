@@ -2,7 +2,6 @@ const path = require('path');
 const builder = require('electron-builder');
 
 builder.build({
-
     projectDir: path.resolve(__dirname),
 
     win: ['nsis'],
@@ -16,6 +15,7 @@ builder.build({
             "icon": path.resolve(__dirname, 'assets/Icon-1024.png'),
         },
         "mac": {
+            "target": "dmg",
             "icon": path.resolve(__dirname, 'assets/Icon-1024.png'),
         }
     },

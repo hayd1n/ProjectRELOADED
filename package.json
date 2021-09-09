@@ -4,7 +4,9 @@
   "description": "ProjectRELOADED 本地化專案管理器",
   "main": "main.js",
   "scripts": {
-    "start": "electron ."
+    "start": "electron .",
+    "build": "electron-builder build --mac --win --publish never",
+    "deploy": "electron-builder build --mac --win --publish always"
   },
   "repository": "https://github.com/CRT-HAO/ProjectRELOADED",
   "keywords": [
@@ -21,8 +23,8 @@
     "adm-zip": "^0.5.5",
     "electron-store": "^8.0.0",
     "electron-titlebar-windows": "^3.0.0",
-    "jQuery": "^1.7.4",
     "jquery": "^3.6.0",
+    "jQuery": "^1.7.4",
     "jsrender": "^1.0.11",
     "jszip": "^3.7.1",
     "marked": "^3.0.2",
@@ -33,5 +35,30 @@
     "rimraf": "^3.0.2",
     "sync-foreach": "^1.0.2",
     "uuid": "^8.3.2"
+  },
+  "build": {
+    "productName": "ProjectRELOADED",
+    "appId": "com.crt_hao.projectreloaded",
+    "dmg": {
+      "contents": [
+        {
+          "x": 110,
+          "y": 150
+        },
+        {
+          "x": 430,
+          "y": 150,
+          "type": "link",
+          "path": "/Applications"
+        }
+      ]
+    },
+    "mac": {
+      "icon": "assets/icon.icns"
+    },
+    "win": {
+      "target": "nsis",
+      "icon": "assets/Icon-256.png"
+    }
   }
 }
