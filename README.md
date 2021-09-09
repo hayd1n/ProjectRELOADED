@@ -1,6 +1,7 @@
 ![ProjectRELOADED Cover](https://user-images.githubusercontent.com/31580253/132604210-814e5f7a-cd5c-4efa-a48e-cc0104226a11.png)
 # ProjectRELOADED
- 本地化專案管理器
+ 本地化專案管理(備份)器  
+ 支援Windows/macOS
  ## 下載 Downloads
  [Releases](https://github.com/CRT-HAO/ProjectRELOADED/releases)
  ## 測試&編譯 Debug & Build
