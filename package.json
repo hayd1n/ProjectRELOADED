@@ -13,7 +13,8 @@
   ],
   "author": "CRT-HAO",
   "devDependencies": {
-    "electron": "^14.0.0"
+    "electron": "^14.0.0",
+    "electron-builder": "^22.11.7"
   },
   "dependencies": {
     "@electron/remote": "^1.2.1",
@@ -21,6 +22,7 @@
     "electron-store": "^8.0.0",
     "electron-titlebar-windows": "^3.0.0",
     "jQuery": "^1.7.4",
+    "jquery": "^3.6.0",
     "jsrender": "^1.0.11",
     "jszip": "^3.7.1",
     "marked": "^3.0.2",

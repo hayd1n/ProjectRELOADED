@@ -27,9 +27,12 @@
           <li class="mdui-menu-item" mdui-dialog="{target: '#settings'}">
             <a href="javascript:;">設置</a>
           </li>
-          <li class="mdui-divider"></li>
           <li class="mdui-menu-item" mdui-dialog="{target: '#about'}">
             <a href="javascript:;">關於</a>
+          </li>
+          <li class="mdui-divider"></li>
+          <li class="mdui-menu-item" exit-app>
+            <a href="javascript:;">退出</a>
           </li>
         </ul>
       </div>
@@ -89,7 +92,13 @@
     <div class="mdui-dialog" id="settings">
       <div class="mdui-dialog-title">設置</div>
       <div class="mdui-dialog-content">
-        目前還沒有，更多功能盡請期待！
+        <div>
+          <label class="mdui-checkbox" start-when-open-checkbox>
+            <input type="checkbox">
+            <i class="mdui-checkbox-icon"></i>
+            開機時啟動
+          </label>
+        </div>
       </div>
       <div class="mdui-dialog-actions">
         <button class="mdui-btn mdui-ripple" mdui-dialog-close>取消</button>
@@ -103,6 +112,8 @@
       <div class="mdui-dialog-content">
         ProjectRELOADED<br>
         一款開源的本地化專案管理(備份)器<br>
+        <br>
+        當前版本：<span app-version></span><br>
         <br>
         項目地址：<a href="https://github.com/CRT-HAO/ProjectRELOADED" target="_blank" class="mdui-text-color-theme-accent">CRT-HAO/ProjectRELOADED</a><br>
         作者：<a href="https://github.com/CRT-HAO" target="_blank" class="mdui-text-color-theme-accent">CRT-HAO</a>

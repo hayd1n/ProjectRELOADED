@@ -5,17 +5,16 @@
  */
 
 var { shell } = require('electron');
-var { dialog } = require('@electron/remote');
+var { app, dialog } = require('@electron/remote');
 window.$ = window.jQuery = require('jquery');
 var jsrender = require('jsrender');
 var path = require('path');
 var marked = require('marked');
-// const { default: mdui } = require('mdui');
 
-const project_card_template = jsrender.templates('./src/template/project_card.jsrender');
-const project_dialog_template = jsrender.templates('./src/template/project_dialog.jsrender');
-const project_files_list_template = jsrender.templates('./src/template/files_list.jsrender');
-const project_backups_list_template = jsrender.templates('./src/template/backups_list.jsrender');
+const project_card_template = jsrender.templates(loadProjectsTemplate(path.join(__dirname, './template/project_card.jsrender')));
+const project_dialog_template = jsrender.templates(loadProjectsTemplate(path.join(__dirname, './template/project_dialog.jsrender')));
+const project_files_list_template = jsrender.templates(loadProjectsTemplate(path.join(__dirname, './template/files_list.jsrender')));
+const project_backups_list_template = jsrender.templates(loadProjectsTemplate(path.join(__dirname, './template/backups_list.jsrender')));
 
 $(window).on('error', (e) => {
     mdui.snackbar({
@@ -31,11 +30,12 @@ $(window).on('error', (e) => {
     console.log(e);
 });
 
-$(document).on('ready', () => {
+window.onload = () => {
     setTimeout(()=>{
         refreshProjects();
     }, 1000);
-});
+};
+
 $('#refresh-projects').on('click', () => {
     refreshProjects();
 });
@@ -51,6 +51,26 @@ $('[choose-add-project-path]').on('click', () => {
         }
       });
 });
+
+mdui.$('#settings').on('open.mdui.dialog', () => {
+    openSettingsDialog();
+});
+
+mdui.$('#settings').on('confirm.mdui.dialog', () => {
+    saveSettingsDialog();
+});
+
+mdui.$('#about').on('open.mdui.dialog', () => {
+    $('#about [app-version]').text(app.getVersion());
+});
+
+$('[exit-app]').on('click', () => {
+    app.exit();
+});
+
+function loadProjectsTemplate(templatePath) {
+    return fs.readFileSync(templatePath, 'utf-8');
+}
 
 function refreshProjects() {
     loadProjects((projects) => {
@@ -294,6 +314,19 @@ function createProjectDialog(projectPath) {
         defaultValue: path.parse(projectPath).name,
         confirmText: "創建",
         cancelText: "取消"
+    });
+}
+
+function openSettingsDialog() {
+    $('#settings [start-when-open-checkbox] input')[0].checked = app.getLoginItemSettings().openAtLogin;
+}
+function saveSettingsDialog() {
+    app.setLoginItemSettings({
+        args: "",
+        openAtLogin: $('#settings [start-when-open-checkbox] input')[0].checked
+    });
+    mdui.snackbar({
+        message: '設置已保存'
     });
 }
 

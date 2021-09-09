@@ -75,5 +75,8 @@ typings/
 # FuseBox cache
 .fusebox/
 
+# build folder
+/build
+
 # Test Folder
 test/

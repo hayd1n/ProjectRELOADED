@@ -259,7 +259,7 @@ function restoreProjectBackup(project, backupFileName, callback) {
             restore();
         }
         function restore() {
-            function deleteAllProjectFiles(projectPath) {
+            function deleteAllProjectFiles(projectPath, callback) {
                 readFileList(projectPath, (filename) => {
                     if(filename != ".projectRELOADED") {
                         const filePath = path.join(projectPath, filename);
@@ -270,15 +270,18 @@ function restoreProjectBackup(project, backupFileName, callback) {
                             fs.unlinkSync(filePath);
                         }
                     }
+                }, () => {
+                    if(callback) callback();
                 });
             }
-            deleteAllProjectFiles(project.path);
-            const zip = new AdmZip(backupFile);
-            zip.extractAllTo(project.path, true);
-            try {
-                fs.unlinkSync(path.join(project.path, "backup.json"));
-            }catch(e){}
-            if(callback) callback();
+            deleteAllProjectFiles(project.path, () => {
+                const zip = new AdmZip(backupFile);
+                zip.extractAllTo(project.path, true);
+                try {
+                    fs.unlinkSync(path.join(project.path, "backup.json"));
+                }catch(e){}
+                if(callback) callback();
+            });
         }
     });
 }
